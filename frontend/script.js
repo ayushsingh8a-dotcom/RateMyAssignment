@@ -148,7 +148,7 @@ rateButton.addEventListener("click", async () => {
     formData.append("instructions", instructions.value);
 
     try {
-const response = await fetch("/.netlify/functions/rate", {
+const response = await fetch("https://ratemyassignment.onrender.com/rate", {
             method: "POST",
             body: formData
         });
