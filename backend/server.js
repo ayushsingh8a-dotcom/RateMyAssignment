@@ -62,7 +62,9 @@ const gradingLimiter = rateLimit({
 });
 
 app.use(cors({
-    origin: "https://ratemyassignment.netlify.app"
+    origin: "https://ratemyassignment.netlify.app",
+    methods: ["POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"]
 }));
 app.use(express.json({
     limit: "100kb"
