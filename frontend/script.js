@@ -155,14 +155,21 @@ const response = await fetch("https://ratemyassignment.onrender.com/rate", {
 
         const result = await response.json();
 
-        if (!response.ok) {
-            throw new Error(result.error || "Something went wrong.");
-        }
+console.log("1 - JSON received", result);
 
-        clearInterval(analysisTimer);
+if (!response.ok) {
+    throw new Error(result.error || "Something went wrong.");
+}
 
-        showResults(result);
+console.log("2 - Response OK");
 
+clearInterval(analysisTimer);
+
+console.log("3 - Calling showResults");
+
+showResults(result);
+
+console.log("4 - showResults finished");
     } catch (error) {
         clearInterval(analysisTimer);
 
