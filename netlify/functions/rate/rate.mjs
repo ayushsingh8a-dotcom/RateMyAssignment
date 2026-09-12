@@ -1,13 +1,13 @@
-const { GoogleGenAI } = require("@google/genai");
-const Busboy = require("busboy");
+import { GoogleGenAI } from "@google/genai";
+import Busboy from "busboy";
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY
 });
 
-function parseMultipart(event) {
-    return new Promise((resolve, reject) => {
-        const contentType = event.headers["content-type"] || event.headers["Content-Type"];
+function parseMultipart(request) {
+    return new Promise(async (resolve, reject) => {
+        const contentType = request.headers.get("content-type");
 
         if (!contentType) {
             return reject(new Error("Missing content type."));
@@ -58,60 +58,60 @@ function parseMultipart(event) {
                 return reject(new Error("File is too large. Maximum size is 10 MB."));
             }
 
-            resolve({
-                file,
-                instructions
-            });
+            resolve({ file, instructions });
         });
 
         busboy.on("error", reject);
 
-        const body = event.isBase64Encoded
-            ? Buffer.from(event.body, "base64")
-            : Buffer.from(event.body || "", "binary");
-
+        const body = Buffer.from(await request.arrayBuffer());
         busboy.end(body);
     });
 }
 
-exports.handler = async (event) => {
-    if (event.httpMethod !== "POST") {
-        return {
-            statusCode: 405,
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
+export default async (request) => {
+    if (request.method !== "POST") {
+        return new Response(
+            JSON.stringify({
                 error: "Method not allowed."
-            })
-        };
+            }),
+            {
+                status: 405,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
     }
 
     try {
-        const { file, instructions } = await parseMultipart(event);
+        const { file, instructions } = await parseMultipart(request);
 
         if (!file) {
-            return {
-                statusCode: 400,
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
+            return new Response(
+                JSON.stringify({
                     error: "Please upload an assignment."
-                })
-            };
+                }),
+                {
+                    status: 400,
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
         }
 
         if (instructions.length > 2000) {
-            return {
-                statusCode: 400,
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
+            return new Response(
+                JSON.stringify({
                     error: "Additional instructions must be 2000 characters or less."
-                })
-            };
+                }),
+                {
+                    status: 400,
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
         }
 
         const allowedMimeTypes = new Set([
@@ -122,15 +122,17 @@ exports.handler = async (event) => {
         ]);
 
         if (!allowedMimeTypes.has(file.mimeType)) {
-            return {
-                statusCode: 400,
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
+            return new Response(
+                JSON.stringify({
                     error: "Unsupported file type."
-                })
-            };
+                }),
+                {
+                    status: 400,
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
         }
 
         const prompt = `
@@ -298,37 +300,40 @@ Be honest, specific, and academically reasonable.
             throw new Error("AI returned an invalid score.");
         }
 
-        return {
-            statusCode: 200,
+        return new Response(JSON.stringify(result), {
+            status: 200,
             headers: {
                 "Content-Type": "application/json"
-            },
-            body: JSON.stringify(result)
-        };
+            }
+        });
 
     } catch (error) {
         console.error("GRADING ERROR:", error.message);
 
         if (error.message.includes("timed out")) {
-            return {
-                statusCode: 504,
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
+            return new Response(
+                JSON.stringify({
                     error: "The AI took too long to respond. Please try again."
-                })
-            };
+                }),
+                {
+                    status: 504,
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
         }
 
-        return {
-            statusCode: 500,
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
+        return new Response(
+            JSON.stringify({
                 error: "Could not evaluate the assignment. Please try again."
-            })
-        };
+            }),
+            {
+                status: 500,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
     }
 };
