@@ -207,14 +207,16 @@ function startAnalysisAnimation() {
     let current = 0;
 
     document.querySelectorAll(".analysis-step").forEach(step => {
-        step.classList.remove("active");
+        step.classList.remove("active", "completed");
     });
 
     document.getElementById("step-reading").classList.add("active");
-
     status.textContent = steps[0].text;
 
     analysisTimer = setInterval(() => {
+        document.getElementById(steps[current].active).classList.remove("active");
+        document.getElementById(steps[current].active).classList.add("completed");
+
         current++;
 
         if (current >= steps.length) {
@@ -223,11 +225,6 @@ function startAnalysisAnimation() {
         }
 
         status.textContent = steps[current].text;
-
-        document.querySelectorAll(".analysis-step").forEach(step => {
-            step.classList.remove("active");
-        });
-
         document.getElementById(steps[current].active).classList.add("active");
 
     }, 2200);
