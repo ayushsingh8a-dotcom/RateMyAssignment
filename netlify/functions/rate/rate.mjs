@@ -1,72 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
-import Busboy from "busboy";
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY
 });
-
-function parseMultipart(request) {
-    return new Promise(async (resolve, reject) => {
-        const contentType = request.headers.get("content-type");
-
-        if (!contentType) {
-            return reject(new Error("Missing content type."));
-        }
-
-        const busboy = Busboy({
-            headers: {
-                "content-type": contentType
-            },
-            limits: {
-                fileSize: 10 * 1024 * 1024,
-                files: 1
-            }
-        });
-
-        let file = null;
-        let instructions = "";
-        let fileTooLarge = false;
-
-        busboy.on("file", (fieldname, stream, info) => {
-            const chunks = [];
-
-            stream.on("data", chunk => {
-                chunks.push(chunk);
-            });
-
-            stream.on("limit", () => {
-                fileTooLarge = true;
-            });
-
-            stream.on("end", () => {
-                file = {
-                    buffer: Buffer.concat(chunks),
-                    filename: info.filename,
-                    mimeType: info.mimeType
-                };
-            });
-        });
-
-        busboy.on("field", (name, value) => {
-            if (name === "instructions") {
-                instructions = value;
-            }
-        });
-
-        busboy.on("finish", () => {
-            if (fileTooLarge) {
-                return reject(new Error("File is too large. Maximum size is 10 MB."));
-            }
-
-            resolve({ file, instructions });
-        });
-
-        busboy.on("error", reject);
-
-        const body = Buffer.from(await request.arrayBuffer());
-        busboy.end(body);
-    });
-}
 
 export default async (request) => {
     if (request.method !== "POST") {
@@ -84,12 +20,29 @@ export default async (request) => {
     }
 
     try {
-        const { file, instructions } = await parseMultipart(request);
+        const formData = await request.formData();
 
-        if (!file) {
+        const file = formData.get("assignment");
+        const instructions = (formData.get("instructions") || "").trim();
+
+        if (!file || typeof file === "string") {
             return new Response(
                 JSON.stringify({
                     error: "Please upload an assignment."
+                }),
+                {
+                    status: 400,
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            return new Response(
+                JSON.stringify({
+                    error: "File is too large. Maximum size is 10 MB."
                 }),
                 {
                     status: 400,
@@ -121,7 +74,7 @@ export default async (request) => {
             "image/png"
         ]);
 
-        if (!allowedMimeTypes.has(file.mimeType)) {
+        if (!allowedMimeTypes.has(file.type)) {
             return new Response(
                 JSON.stringify({
                     error: "Unsupported file type."
@@ -134,6 +87,8 @@ export default async (request) => {
                 }
             );
         }
+
+        const buffer = Buffer.from(await file.arrayBuffer());
 
         const prompt = `
 You are a strict but fair college professor grading a student's assignment.
@@ -155,7 +110,7 @@ If an answer is missing, mention that and consider it when grading.
 If the assignment does not have clearly numbered questions, identify the separate questions or tasks yourself.
 
 Additional instructions from the student:
-${instructions.trim() || "None"}
+${instructions || "None"}
 
 Return the evaluation as structured JSON.
 
@@ -174,8 +129,8 @@ Be honest, specific, and academically reasonable.
                     },
                     {
                         inlineData: {
-                            mimeType: file.mimeType,
-                            data: file.buffer.toString("base64")
+                            mimeType: file.type,
+                            data: buffer.toString("base64")
                         }
                     }
                 ],

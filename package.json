@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "@google/genai": "^2.22.0",
-    "busboy": "^1.6.0"
+    "@google/genai": "^2.22.0"
   }
 }
