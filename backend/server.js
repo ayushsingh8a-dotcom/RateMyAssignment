@@ -7,7 +7,7 @@ const { GoogleGenAI } = require("@google/genai");
 require("dotenv").config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.use(helmet());
 
 const ai = new GoogleGenAI({
@@ -61,7 +61,11 @@ const gradingLimiter = rateLimit({
     }
 });
 
-app.use(cors());
+app.use(cors({
+    origin: "https://ratemyassignment.netlify.app",
+    methods: ["POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"]
+}));
 app.use(express.json({
     limit: "100kb"
 }));
