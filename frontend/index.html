@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate My Assignment</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+    ◐
+</button>
+
+    <main id="upload-page">
+
+        <main id="upload-page">
+
+    <div class="floating-background" aria-hidden="true">
+        <span>∫ f(x) dx</span>
+        <span>∑ x²</span>
+        <span>Q = mc²</span>
+        <span>10110101</span>
+        <span>∀ x ∈ R</span>
+        <span>f(x) = ax + b</span>
+        <span>∂y / ∂x</span>
+        <span>√(a² + b²)</span>
+        <span>42 × 17 = ?</span>
+        <span>log₂(n)</span>
+        <span>if (x > 0)</span>
+        <span>O(n log n)</span>
+        <span>Σ = 100</span>
+        <span>x + y = z</span>
+        <span>while(true)</span>
+        <span>10101010</span>
+        <span>Knowledge → Understanding</span>
+        <span>Answer the question</span>
+        <span>Check your work</span>
+        <span>∴ Therefore...</span>
+        <span>π ≈ 3.14159</span>
+        <span>Accuracy matters</span>
+        <span>Question 06</span>
+        <span>87 / 100</span>
+    </div>
+
+    <div class="header">
+
+        <div class="header">
+            <div class="brand">Rate My Assignment</div>
+            <h1>Know how good<br>your assignment really is.</h1>
+            <p>Upload your assignment and get honest AI-powered feedback.</p>
+        </div>
+
+        <label>Assignment</label>
+
+        <div class="upload-box" id="upload-box">
+            <input type="file" id="assignment" accept=".pdf,.jpg,.jpeg,.png,.txt">
+
+            <label for="assignment" class="upload-label" id="upload-label">
+                <span class="upload-icon">↑</span>
+                <strong>Drop your assignment here</strong>
+                <small>or click to browse · PDF, JPG, PNG, or TXT · Maximum 10 MB</small>
+            </label>
+        </div>
+
+        <div id="file-info" class="file-info hidden">
+            <div class="file-icon">📄</div>
+
+            <div class="file-details">
+                <strong id="file-name"></strong>
+                <small id="file-size"></small>
+            </div>
+
+            <button type="button" id="remove-file" class="remove-file">×</button>
+        </div>
+
+        <label for="instructions">
+            Additional Instructions <span>(Optional)</span>
+        </label>
+
+        <textarea
+            id="instructions"
+            maxlength="2000"
+            placeholder="Anything you'd like the AI to know? For example: &quot;Grade this strictly according to my college syllabus.&quot;"
+        ></textarea>
+
+        <div class="character-count">
+            <span id="character-count">0</span>/2000
+        </div>
+
+        <button id="rate-button">RATE MY ASSIGNMENT</button>
+
+        <div class="privacy-note">
+            Your assignment is processed by AI to generate your feedback.
+        </div>
+
+    </main>
+
+
+    <main id="analyzing-page" class="hidden">
+
+        <div class="analyzing-card">
+
+            <div class="loader"></div>
+
+            <h1>Analyzing your assignment</h1>
+
+            <p id="analysis-status">Reading your assignment...</p>
+
+            <div class="analysis-steps">
+                <div class="analysis-step active" id="step-reading">
+                    <span>✓</span>
+                    Reading assignment
+                </div>
+
+                <div class="analysis-step" id="step-questions">
+                    <span>2</span>
+                    Identifying questions
+                </div>
+
+                <div class="analysis-step" id="step-grading">
+                    <span>3</span>
+                    Grading your answers
+                </div>
+
+                <div class="analysis-step" id="step-results">
+                    <span>4</span>
+                    Preparing results
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <main id="results-page" class="hidden">
+
+        <div class="results-header">
+
+            <button id="back-button" class="back-button">
+                ← Rate Another Assignment
+            </button>
+
+            <div class="brand">Rate My Assignment</div>
+
+            <h1>Your Results</h1>
+
+            <p>Here's how your assignment performed.</p>
+
+        </div>
+
+        <section class="score-card">
+
+            <div class="score-circle">
+                <strong id="score">--</strong>
+                <span>/ 100</span>
+            </div>
+
+            <div class="grade-box">
+                <span>Grade</span>
+                <strong id="grade">--</strong>
+            </div>
+
+            <p id="summary"></p>
+
+        </section>
+
+        <section class="card">
+
+            <h2>Performance Breakdown</h2>
+
+            <div class="category">
+                <div>
+                    <span>Content</span>
+                    <strong id="content-score">--/20</strong>
+                </div>
+
+                <div class="progress">
+                    <div id="content-bar"></div>
+                </div>
+            </div>
+
+            <div class="category">
+                <div>
+                    <span>Clarity</span>
+                    <strong id="clarity-score">--/20</strong>
+                </div>
+
+                <div class="progress">
+                    <div id="clarity-bar"></div>
+                </div>
+            </div>
+
+            <div class="category">
+                <div>
+                    <span>Understanding</span>
+                    <strong id="understanding-score">--/20</strong>
+                </div>
+
+                <div class="progress">
+                    <div id="understanding-bar"></div>
+                </div>
+            </div>
+
+            <div class="category">
+                <div>
+                    <span>Structure</span>
+                    <strong id="structure-score">--/20</strong>
+                </div>
+
+                <div class="progress">
+                    <div id="structure-bar"></div>
+                </div>
+            </div>
+
+            <div class="category">
+                <div>
+                    <span>Completeness</span>
+                    <strong id="completeness-score">--/20</strong>
+                </div>
+
+                <div class="progress">
+                    <div id="completeness-bar"></div>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="card">
+
+            <h2>Question Breakdown</h2>
+
+            <div id="questions"></div>
+
+        </section>
+
+        <div class="two-column">
+
+            <section class="card">
+                <h2>✓ Strengths</h2>
+                <ul id="strengths"></ul>
+            </section>
+
+            <section class="card">
+                <h2>⚠ Areas to Improve</h2>
+                <ul id="weaknesses"></ul>
+            </section>
+
+        </div>
+
+        <section class="card">
+
+            <h2>Suggestions</h2>
+
+            <ul id="suggestions"></ul>
+
+        </section>
+
+        <section class="verdict-card">
+
+            <h2>Final Verdict</h2>
+
+            <p id="verdict"></p>
+
+        </section>
+
+        <button id="again-button" class="again-button">
+            RATE ANOTHER ASSIGNMENT
+        </button>
+
+    </main>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
